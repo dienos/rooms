@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">rooms</string>
+    <string name="action_settings">Settings</string>
+    <string name="room_type">방 종류</string>
+    <string name="property_type">매물 종류</string>
+    <string name="monthly">월세</string>
+    <string name="charter">전세</string>
+    <string name="bargain">매매</string>
+    <string name="one_room">원룸</string>
+    <string name="two_three_room">투쓰리룸</string>
+    <string name="officetel">오피스텔</string>
+    <string name="apartment">아파트</string>
+    <string name="average_payment">평균 매물가</string>
+    <string name="average_monthly">평균월세</string>
+    <string name="average_charter">평균전세</string>
+</resources>
