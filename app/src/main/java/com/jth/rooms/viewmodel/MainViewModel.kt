@@ -89,7 +89,7 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
         return data
     }
 
-    fun getPagedItem(): LiveData<PagedList<Room>> {
+    private fun getPagedItem(): LiveData<PagedList<Room>> {
         val config = PagedList.Config.Builder()
             .setInitialLoadSizeHint(100)
             .setPageSize(12)
@@ -119,6 +119,8 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
         }
 
         val filterRoom : ArrayList<ParsingRoom> = arrayListOf()
+
+        repo.average = data?.average?.first()
 
         data?.rooms?.forEach {
             roomTypeFilter.forEach {
