@@ -8,6 +8,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jth.rooms.BR
+import com.jth.rooms.R
 import com.jth.rooms.databinding.RoomListItemAverageBinding
 import com.jth.rooms.databinding.RoomListItemTypeAptBinding
 import com.jth.rooms.databinding.RoomListItemTypeOneTwoBinding
@@ -17,28 +18,40 @@ import com.jth.rooms.viewmodel.MainViewModel
 
 class RoomListAdapter(val viewModel : MainViewModel) : PagedListAdapter<Room, RoomListAdapter.RoomListViewHolder>(diffCallback) {
     override fun onBindViewHolder(holder: RoomListViewHolder, position: Int) {
-        when(getItemViewType(position)) {
-            0 -> {
-                holder.bindTypeOne(viewModel, getItem(position))
-            }
-            1 -> {
-                holder.bindTypeApt(viewModel, getItem(position))
-            }
-            else -> {
-                holder.bindTypeAverage(viewModel, getItem(position))
+        getItem(position)?.let {
+            getItemViewType(position).let {
+                when(it) {
+                    0 -> {
+                        holder.bindTypeOne(viewModel, getItem(position))
+                    }
+                    1 -> {
+                        holder.bindTypeApt(viewModel, getItem(position))
+                    }
+                    else -> {
+                        holder.bindTypeAverage(viewModel, getItem(position))
+                    }
+                }
             }
         }
+    }
+
+    override fun getItemCount(): Int {
+        return super.getItemCount()
+    }
+
+    override fun getItem(position: Int): Room? {
+        return super.getItem(position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomListViewHolder {
         val view : View
 
         if(viewType == 0) {
-            view = LayoutInflater.from(parent.context).inflate(com.jth.rooms.R.layout.room_list_item_type_one_two, parent, false)
+            view = LayoutInflater.from(parent.context).inflate(R.layout.room_list_item_type_one_two, parent, false)
         } else if(viewType == 1) {
-            view = LayoutInflater.from(parent.context).inflate(com.jth.rooms.R.layout.room_list_item_type_apt, parent, false)
+            view = LayoutInflater.from(parent.context).inflate(R.layout.room_list_item_type_apt, parent, false)
         } else {
-            view = LayoutInflater.from(parent.context).inflate(com.jth.rooms.R.layout.room_list_item_average, parent, false)
+            view = LayoutInflater.from(parent.context).inflate(R.layout.room_list_item_average, parent, false)
         }
 
         return  RoomListViewHolder(view)
@@ -51,13 +64,17 @@ class RoomListAdapter(val viewModel : MainViewModel) : PagedListAdapter<Room, Ro
             }
 
             override fun areContentsTheSame(oldItem: Room, newItem: Room): Boolean {
-                return oldItem == newItem
+                return oldItem.id == newItem.id
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getItem(position)?.viewType!!
+        getItem(position)?.viewType?.apply {
+            return getItem(position)?.viewType!!
+        }
+
+        return -1
     }
 
     class RoomListViewHolder(val view : View) : RecyclerView.ViewHolder(view) {

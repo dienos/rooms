@@ -14,4 +14,5 @@
     <color name="room_card_blue">#3C7DFA</color>
     <color name="line">#F0F0F0</color>
     <color name="room_card_line">#E5E5E5</color>
+    <color name="hash_tag">#F4F4F4</color>
 </resources>

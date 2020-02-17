@@ -29,6 +29,7 @@
             android:paddingEnd="15dp"
             android:paddingBottom="20dp">
 
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -45,8 +46,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/black"
                         android:text="@{RoomListItem.selling_type}"
+                        android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -72,6 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
+                    android:singleLine="true"
                     android:text="@{RoomListItem.desc}"
                     android:textColor="@color/gray"
                     android:textSize="13sp" />
@@ -80,18 +82,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:orientation="horizontal"></LinearLayout>
+                    android:orientation="horizontal"
+                    app:hash_tag="@{RoomListItem.hash_tags}" />
             </LinearLayout>
-
 
             <RelativeLayout
                 android:layout_width="126dp"
                 android:layout_height="84dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginStart="14dp">
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     app:img_url="@{RoomListItem.img_url}" />
 
                 <CheckBox
@@ -101,7 +104,6 @@
                     android:layout_marginTop="6dp"
                     android:layout_marginRight="6dp"
                     android:checked="@{RoomListItem._check}"
-                    android:enabled="false"
                     android:paddingTop="10dp"
                     android:textColor="@color/room_type_unchecked" />
             </RelativeLayout>
