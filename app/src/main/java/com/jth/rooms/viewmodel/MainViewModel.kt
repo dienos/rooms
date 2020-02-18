@@ -2,14 +2,15 @@ package com.jth.rooms.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jth.rooms.repo.MainRepository
+import com.jth.rooms.repo.NotNullMutableLiveData
 import com.jth.rooms.repo.model.*
 import com.jth.rooms.usecase.MainActivityUseCase
+import com.jth.rooms.repo.RoomDataFactory
 
 class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepository) :
     ViewModel() {
@@ -20,12 +21,14 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
         const val VIEW_TYPE_AVERAGE = 2
     }
 
-    var roomListData = RoomListData()
-    lateinit var roomPagedList: LiveData<PagedList<Room>>
-    var roomTypeFilter : ArrayList<Int> = arrayListOf(0, 1, 2, 3)
-    var sellingTypeFilter : ArrayList<Int> = arrayListOf(0, 1, 2)
+    var roomDataFactory: RoomDataFactory? = null
+    private var filerList : List<Room> = arrayListOf()
+    var liveFilerList : NotNullMutableLiveData<List<Room>> = NotNullMutableLiveData(arrayListOf())
+    var roomListData : NotNullMutableLiveData<RoomListData> =  NotNullMutableLiveData(RoomListData())
+    var roomTypeFilter: ArrayList<Int> = arrayListOf(0, 1, 2, 3)
+    var sellingTypeFilter: ArrayList<Int> = arrayListOf(0, 1, 2)
 
-    private val parsingData: ParsingData ?= null
+    private val parsingData: ParsingData? = null
 
     private fun getJsonString(): ParsingData? {
         useCase.fromAssets(fileName)?.let {
@@ -89,7 +92,7 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
         return data
     }
 
-    private fun getPagedItem(): LiveData<PagedList<Room>> {
+    fun getPagedItem(): LiveData<PagedList<Room>> {
         val config = PagedList.Config.Builder()
             .setInitialLoadSizeHint(100)
             .setPageSize(12)
@@ -97,57 +100,51 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
             .setEnablePlaceholders(false)
             .build()
 
-        val filtered = roomListData.rooms.filter { it.id <= 11 }
+        filerList = roomListData.value.rooms.filter { it.id <= 11 }
+        val factory = RoomDataFactory(liveFilerList, roomListData.value.rooms)
+        roomDataFactory = factory
+        liveFilerList.value = filerList
 
-        roomPagedList =
-            LivePagedListBuilder<Int, Room>(object : DataSource.Factory<Int, Room>() {
-                override fun create(): DataSource<Int, Room> {
-                    return RoomPositionalDataSource(filtered, roomListData.rooms)
-                }
-            }, config).build()
-
-        return roomPagedList
+        return LivePagedListBuilder(factory, config).build()
     }
 
     fun makePagedList() {
-        val data : ParsingData?
+        val data: ParsingData?
 
-        if(parsingData == null) {
-             data = getJsonString()
+        if (parsingData == null) {
+            data = getJsonString()
         } else {
             data = parsingData
         }
 
-        val filterRoom : ArrayList<ParsingRoom> = arrayListOf()
+        val filterRoom: ArrayList<ParsingRoom> = arrayListOf()
 
         repo.average = data?.average?.first()
 
         data?.rooms?.forEach {
-            roomTypeFilter.forEach {
-                roomType ->
-                sellingTypeFilter.forEach {
-                    sellingType ->
-                    if(it.room_type == roomType && it.selling_type == sellingType) {
+            roomTypeFilter.forEach { roomType ->
+                sellingTypeFilter.forEach { sellingType ->
+                    if (it.room_type == roomType && it.selling_type == sellingType) {
                         filterRoom.add(it)
                     }
                 }
             }
         }
 
-        if(filterRoom.isNotEmpty()) {
+        if (filterRoom.isNotEmpty()) {
             data?.rooms?.clear()
             data?.rooms?.addAll(filterRoom)
         }
 
         data?.apply {
             val list: ArrayList<Room> = arrayListOf()
-            roomListData.average = average
+            roomListData.value.average = average
 
             rooms.forEachIndexed { i, it ->
                 val item = Room()
                 item.id = i
 
-                if(item.id == 11) {
+                if (item.id == 11) {
                     item.viewType = VIEW_TYPE_AVERAGE
                 } else {
                     item.viewType = getViewType(it.room_type)
@@ -163,9 +160,7 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
                 list.add(item)
             }
 
-            roomListData.rooms = list
+            roomListData.value.rooms = list
         }
-
-        roomPagedList = getPagedItem()
     }
 }
