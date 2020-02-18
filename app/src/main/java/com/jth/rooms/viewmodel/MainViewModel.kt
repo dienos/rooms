@@ -7,7 +7,6 @@ import androidx.paging.PagedList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jth.rooms.repo.MainRepository
-import com.jth.rooms.repo.NotNullMutableLiveData
 import com.jth.rooms.repo.model.*
 import com.jth.rooms.usecase.MainActivityUseCase
 import com.jth.rooms.repo.RoomDataFactory
@@ -22,9 +21,7 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
     }
 
     var roomDataFactory: RoomDataFactory? = null
-    private var filerList : List<Room> = arrayListOf()
-    var liveFilerList : NotNullMutableLiveData<List<Room>> = NotNullMutableLiveData(arrayListOf())
-    var roomListData : NotNullMutableLiveData<RoomListData> =  NotNullMutableLiveData(RoomListData())
+
     var roomTypeFilter: ArrayList<Int> = arrayListOf(0, 1, 2, 3)
     var sellingTypeFilter: ArrayList<Int> = arrayListOf(0, 1, 2)
 
@@ -100,10 +97,9 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
             .setEnablePlaceholders(false)
             .build()
 
-        filerList = roomListData.value.rooms.filter { it.id <= 11 }
-        val factory = RoomDataFactory(liveFilerList, roomListData.value.rooms)
+        repo.filerList = repo.roomListData.rooms.filter { it.id <= 11 }
+        val factory = RoomDataFactory()
         roomDataFactory = factory
-        liveFilerList.value = filerList
 
         return LivePagedListBuilder(factory, config).build()
     }
@@ -138,7 +134,7 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
 
         data?.apply {
             val list: ArrayList<Room> = arrayListOf()
-            roomListData.value.average = average
+            repo.roomListData.average = average
 
             rooms.forEachIndexed { i, it ->
                 val item = Room()
@@ -160,7 +156,7 @@ class MainViewModel(private val useCase: MainActivityUseCase, val repo: MainRepo
                 list.add(item)
             }
 
-            roomListData.value.rooms = list
+            repo.roomListData.rooms = list
         }
     }
 }

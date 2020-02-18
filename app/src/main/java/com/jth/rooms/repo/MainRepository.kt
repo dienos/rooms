@@ -1,8 +1,12 @@
 package com.jth.rooms.repo
 
 import com.jth.rooms.repo.model.Average
+import com.jth.rooms.repo.model.Room
+import com.jth.rooms.repo.model.RoomListData
 
 class MainRepository {
+    var filerList : List<Room> = arrayListOf()
+    var roomListData : RoomListData =  RoomListData()
     var average : Average ?= null
 
     companion object {
